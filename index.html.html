@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BEI Course Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--coral:#CD5C5C;--ink:#5a3a36;--dim:#9a6f67;--card:#fffaf4;--line:#f0cfc2;--ok:#6f9f7f;--sand:#fff4ea;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--ink);font:16px/1.55 "Nunito",system-ui,sans-serif;background-color:var(--sand);
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='300'%3E%3Cg font-family='monospace' font-size='22' font-weight='bold' fill='%23CD5C5C' fill-opacity='.11'%3E%3Ctext x='18' y='40'%3E%7B %7D%3C/text%3E%3Ctext x='150' y='90'%3E%3C/%3E%3C/text%3E%3Ctext x='270' y='36'%3E=%3E%3C/text%3E%3Ctext x='40' y='150'%3E0101 1100%3C/text%3E%3Ctext x='230' y='170'%3Efor(;;)%3C/text%3E%3Ctext x='20' y='250'%3Eprint()%3C/text%3E%3Ctext x='170' y='260'%3E%5B ];%3C/text%3E%3Ctext x='310' y='110'%3E%23!%3C/text%3E%3Ctext x='300' y='270'%3E0x1F%3C/text%3E%3C/g%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='none' stroke='%23CD5C5C' stroke-opacity='.16' stroke-width='2'%3E%3Cpath d='M0 40h60l20 20h80l20-20h60'/%3E%3Cpath d='M0 120h40l30 30v60'/%3E%3Cpath d='M240 90h-50l-30 30h-40v70l20 20h70'/%3E%3Cpath d='M120 0v30l20 20'/%3E%3C/g%3E%3Cg fill='%23fff4ea' stroke='%23CD5C5C' stroke-opacity='.3' stroke-width='2'%3E%3Ccircle cx='60' cy='40' r='5'/%3E%3Ccircle cx='160' cy='60' r='5'/%3E%3Ccircle cx='70' cy='210' r='5'/%3E%3Ccircle cx='140' cy='50' r='5'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(180deg,#fff7ee,#ffe4d4 60%,#f8cdbd);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 85% 0,#ffe2a888,transparent 38%),radial-gradient(ellipse at 10% 10%,#ffd2c066,transparent 50%);pointer-events:none;z-index:-1}
+body::after{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#fff7ee;z-index:10}
+h1,h2{font-family:"Nunito",system-ui,sans-serif}
+header{max-width:1100px;margin:0 auto;padding:40px 20px 10px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;position:relative}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.15;margin:0 0 10px;font-weight:800;color:var(--coral)}
+.sub{color:var(--dim);max-width:46ch;margin:0 0 16px}
+.term{display:inline-block;margin:0 0 16px;padding:10px 14px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;font:400 13px/1.6 "Fira Code",ui-monospace,monospace;color:var(--ink);text-align:left;white-space:pre-wrap}
+.k{color:var(--coral)}.n{color:#c0803a}.c{color:#a98a82}.br{color:#c9a094;font-weight:600}
+.stats{display:flex;gap:12px;flex-wrap:wrap}
+.stat{border:1.5px solid var(--line);background:var(--card);padding:8px 16px;border-radius:12px;min-width:96px}
+.stat b{display:block;font:800 26px "Nunito",sans-serif;color:var(--coral)}
+.stat span{font-size:13px;color:var(--dim)}
+.chip{position:relative;width:200px;height:200px;display:grid;place-items:center}
+.chip svg{position:absolute;inset:0;width:100%;height:100%}
+.pct{position:relative;text-align:center}
+.pct b{font:800 42px/1 "Nunito",sans-serif;display:block;color:var(--ink)}
+.pct span{font-size:13px;color:var(--dim)}
+.hills{position:fixed;left:0;right:0;bottom:0;height:22vh;pointer-events:none;z-index:-1}
+.hills svg{width:100%;height:100%;display:block}
+.bar{max-width:1060px;margin:14px auto 6px;height:12px;border-radius:8px;background:#f6dccf;overflow:hidden;width:calc(100% - 40px)}
+.bar i{display:block;height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,#f1a592,#CD5C5C 60%,#b8c9a8);transition:width .5s}
+.tools{max-width:1100px;margin:0 auto;padding:6px 20px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--dim);font-size:14px}
+button{font:inherit;font-weight:600;color:var(--coral);background:var(--card);border:1.5px solid var(--coral);border-radius:20px;padding:5px 16px;cursor:pointer}
+button:hover{background:var(--coral);color:#fff}
+:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+main{max-width:1100px;margin:0 auto;padding:10px 20px 20vh;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px 16px 10px;position:relative;box-shadow:0 8px 22px #cd5c5c1f}
+.card.done{border-color:var(--ok);background:#f7fbf4}
+.card h2{margin:4px 0 2px;font-size:19px;font-weight:800;text-align:center;color:var(--coral)}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--dim);margin:6px 0 10px;gap:10px}
+.mini{flex:1;height:6px;background:#f6dccf;border-radius:3px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--coral);width:0;transition:width .4s}
+.card.done .mini i{background:var(--ok)}
+label{display:flex;gap:12px;align-items:center;padding:9px 6px;border-top:1px dashed var(--line);cursor:pointer;border-radius:8px}
+label:hover{background:#cd5c5c0f}
+input{position:absolute;opacity:0}
+.box{flex:none;width:22px;height:22px;border:2px solid var(--coral);border-radius:7px;display:grid;place-items:center;transition:.15s;background:#fff}
+.box svg{width:14px;height:14px;opacity:0;stroke:#fff;stroke-width:3.5;fill:none}
+input:checked+.box{background:var(--ok);border-color:var(--ok)}
+input:checked+.box svg{opacity:1}
+input:focus-visible+.box{outline:2px solid var(--coral);outline-offset:2px}
+.code{font:500 12px "Fira Code",ui-monospace,monospace;color:var(--coral);display:block}
+.t{display:block;line-height:1.3}
+input:checked~.txt .t{color:var(--dim);text-decoration:line-through;text-decoration-color:#6f9f7f88}
+#msg{text-align:center;color:var(--ok);font:800 18px "Nunito",sans-serif;min-height:26px;padding:0 20px}
+@media(max-width:700px){header{grid-template-columns:1fr;justify-items:center;text-align:center}.stats{justify-content:center}.sub{margin-inline:auto}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+<div>
+<h1>Electronics, Communication &amp; Information Engineering</h1>
+<p class="sub">Tick each subject as you finish it. Your progress is counted across all 51 subjects of the B.E. program.</p>
+<pre class="term" id="term"></pre>
+<div class="stats">
+<div class="stat"><b id="sDone">0</b><span>completed</span></div>
+<div class="stat"><b id="sLeft">51</b><span>remaining</span></div>
+<div class="stat"><b id="sTotal">51</b><span>total subjects</span></div>
+</div>
+</div>
+<div class="hills" aria-hidden="true"><svg viewBox="0 0 1200 220" preserveAspectRatio="none"><path d="M0 120C200 60 400 150 620 100S1000 40 1200 110V220H0Z" fill="#f4b9a6" fill-opacity=".45"/><path d="M0 160C250 110 450 190 700 150S1050 110 1200 150V220H0Z" fill="#CD5C5C" fill-opacity=".28"/><path d="M0 190C300 160 600 210 900 180S1100 170 1200 190V220H0Z" fill="#b8c9a8" fill-opacity=".55"/></svg></div>
+<div class="chip" aria-hidden="true">
+<svg viewBox="0 0 200 200">
+<g stroke="#CD5C5C" stroke-width="4" stroke-linecap="round" id="pins"></g>
+<rect x="30" y="30" width="140" height="140" rx="14" fill="#fff6ee" stroke="#CD5C5C" stroke-width="3"/>
+<circle cx="100" cy="100" r="52" fill="none" stroke="#f3d5c8" stroke-width="10"/>
+<circle id="ring" cx="100" cy="100" r="52" fill="none" stroke="#CD5C5C" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" transform="rotate(-90 100 100)" style="transition:stroke-dashoffset .5s"/>
+</svg>
+<div class="pct"><b id="pct">0%</b><span>complete</span></div>
+</div>
+</header>
+<div class="bar" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="100" id="pb"><i id="fill"></i></div>
+<div class="tools"><span id="note">Saved on this device</span><button id="reset" type="button">Clear all</button></div>
+<div id="msg" aria-live="polite"></div>
+<main id="grid"></main>
+
+<script>
+var DATA=[
+["Year I · Part I",[["SH 401","Engineering Mathematics I"],["ME 401","Engineering Drawing I"],["EE 401","Basic Electrical Engineering"],["CT 401","Computer Programming"],["SH 402","Engineering Physics"],["EX 401","Digital Logic"]]],
+["Year I · Part II",[["SH 451","Engineering Mathematics II"],["EX 452","Microprocessor"],["SH 453","Engineering Chemistry"],["CT 451","Object Oriented Programming"],["ME 453","Workshop Technology"],["EE 460","Electric Circuits and Machines"]]],
+["Year II · Part I",[["SH 501","Engineering Mathematics III"],["EX 501","Electronics Devices and Circuits"],["EX 509","Control Systems"],["SH 510","Probability & Statistics"],["EX 503","Electromagnetics"],["EX 510","Instrumentation"]]],
+["Year II · Part II",[["SH 551","Applied Mathematics"],["CT 551","Discrete Structure"],["CT 552","Data Structure & Algorithms"],["EX 553","Advanced Electronics"],["EX 554","Computer Graphics"],["SH 553","Numerical Methods"]]],
+["Year III · Part I",[["CE 615","Engineering Economics"],["CT 610","Database Management Systems"],["CT 613","Computer Network"],["CT 603","Computer Organization and Architecture"],["CT 612","Operating Systems"],["EX 605","Filter Design"]]],
+["Year III · Part II",[["SH 655","Communication English"],["CT 658","Project Management"],["EX 653","Propagation and Antenna"],["EX 656","Communication Systems"],["CT 657","Object Oriented Software Engineering"],["CT 655","Embedded Systems"],["EX 654","Minor Project"]]],
+["Year IV · Part I",[["EX 716","RF and Microwave Engineering"],["CT 710","Artificial Intelligence"],["ME 708","Organization and Management"],["EX 710","Digital Signal Analysis and Processing"],["EX 715","Wireless Communication"],["EX 725..","Elective I"],["EX 707","Project (Part A)"]]],
+["Year IV · Part II",[["EX 756","Telecommunications"],["CE 752","Professional Practice"],["EX 757","Energy, Environment and Society"],["CT 751","Information Systems"],["EX 765..","Elective II"],["EX 785..","Elective III"],["EX 755","Project (Part B)"]]]
+];
+var KEY="bei-tracker-v1",state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){state={}}
+var total=0;DATA.forEach(function(s){total+=s[1].length});
+var grid=document.getElementById("grid");
+var CHECK='<svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 4.5"/></svg>';
+
+DATA.forEach(function(s,si){
+  var card=document.createElement("section");card.className="card";card.id="c"+si;
+  var h='<h2><span class="br">&lt;</span>'+s[0]+'<span class="br"> /&gt;</span></h2><div class="meta"><span id="n'+si+'"></span><div class="mini"><i id="m'+si+'"></i></div></div>';
+  s[1].forEach(function(c,ci){
+    var id=si+"-"+ci;
+    h+='<label><input type="checkbox" data-id="'+id+'"'+(state[id]?' checked':'')+'><span class="box">'+CHECK+'</span><span class="txt"><span class="code">'+c[0]+'</span><span class="t">'+c[1]+'</span></span></label>';
+  });
+  card.innerHTML=h;grid.appendChild(card);
+});
+
+var pins=document.getElementById("pins"),p="";
+for(var i=0;i<6;i++){var o=50+i*20;p+='<path d="M'+o+' 30V14M'+o+' 170v16M30 '+o+'H14M170 '+o+'h16"/>'}
+pins.innerHTML=p;
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function update(){
+  var done=0;
+  DATA.forEach(function(s,si){
+    var d=0;s[1].forEach(function(c,ci){if(state[si+"-"+ci])d++});
+    done+=d;
+    document.getElementById("n"+si).textContent=d+" of "+s[1].length+" done";
+    document.getElementById("m"+si).style.width=(d/s[1].length*100)+"%";
+    document.getElementById("c"+si).classList.toggle("done",d===s[1].length);
+  });
+  var pc=Math.round(done/total*100);
+  document.getElementById("sDone").textContent=done;
+  document.getElementById("sLeft").textContent=total-done;
+  document.getElementById("pct").textContent=pc+"%";
+  document.getElementById("term").innerHTML='<span class="k">const</span> done = <span class="n">'+done+'</span>;\n<span class="k">const</span> remaining = <span class="n">'+(total-done)+'</span>;\n<span class="c">// '+pc+'% complete</span>';
+  document.getElementById("fill").style.width=pc+"%";
+  document.getElementById("pb").setAttribute("aria-valuenow",pc);
+  document.getElementById("ring").style.strokeDashoffset=326.7*(1-done/total);
+  document.getElementById("msg").textContent=done===total?"All subjects complete. Congratulations, engineer!":"";
+}
+grid.addEventListener("change",function(e){
+  var id=e.target.getAttribute("data-id");if(!id)return;
+  if(e.target.checked)state[id]=1;else delete state[id];
+  save();update();
+});
+document.getElementById("reset").onclick=function(){
+  if(!confirm("Clear all checkmarks?"))return;
+  state={};save();
+  Array.prototype.forEach.call(grid.querySelectorAll("input"),function(i){i.checked=false});
+  update();
+};
+update();
+</script>
+</body>
+</html>
